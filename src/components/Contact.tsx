@@ -11,7 +11,7 @@ export default function Contact() {
         title="Contact Us | MyGST Solution" 
         description="Ready to streamline your GST compliance? Reach out to our GST experts for a personalized online consultation. Get in touch within 5 minutes."
       />
-      <div className="py-24 px-6 max-w-6xl mx-auto w-full flex flex-col md:flex-row gap-12 items-center">
+      <div className="py-12 md:py-24 px-6 max-w-6xl mx-auto w-full flex flex-col md:flex-row gap-6 md:gap-12 items-center">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}

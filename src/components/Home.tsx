@@ -14,7 +14,7 @@ export default function Home() {
         description="Expert GST compliance, advisory, return filing, and dispute resolution services for Indian businesses."
       />
       {/* Hero Section */}
-      <header className="py-24 px-6 text-center relative">
+      <header className="py-12 md:py-24 px-6 text-center relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -51,8 +51,8 @@ export default function Home() {
       </header>
 
       {/* Services Grid */}
-      <section className="py-24 px-6 max-w-7xl mx-auto w-full">
-        <div className="text-center mb-16">
+      <section className="py-12 md:py-24 px-6 max-w-7xl mx-auto w-full">
+        <div className="text-center mb-8 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
             Expert GST Consulting Services
           </h2>

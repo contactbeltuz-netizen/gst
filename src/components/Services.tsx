@@ -35,12 +35,12 @@ export default function Services() {
         title="GST Consulting Services | MyGST Solution" 
         description="Expert GST advisory and processing services for SMEs, Startups, and Large Enterprises. Registration, Audits, Filing, and more."
       />
-      <div className="py-24 px-6 max-w-6xl mx-auto w-full">
+      <div className="py-12 md:py-24 px-6 max-w-6xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
         >
           <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-white leading-[1.1]">
             Our <span className="text-amber-400">Services</span>
@@ -50,7 +50,7 @@ export default function Services() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-12 md:mb-24">
           {services.map((service, index) => (
             <motion.div
               key={index}

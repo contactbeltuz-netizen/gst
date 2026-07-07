@@ -1,16 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { MessageSquare, ChevronDown } from "lucide-react";
+import { MessageSquare, ChevronDown, Menu, X, Calculator, Search } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<number | null>(null);
 
-  // Close dropdown on route change
+  // Close dropdown and mobile menu on route change
   useEffect(() => {
     setIsToolsMenuOpen(false);
+    setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
   // Click outside to close
@@ -45,7 +48,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <div className="fixed top-[20%] right-[10%] w-[300px] h-[300px] bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
       {/* Navigation */}
-      <nav className="h-20 px-6 md:px-10 flex items-center justify-between backdrop-blur-xl bg-white/5 border-b border-white/10 z-50 sticky top-0">
+      <nav className="h-16 md:h-20 px-6 md:px-10 flex items-center justify-between backdrop-blur-xl bg-white/5 border-b border-white/10 z-50 sticky top-0">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl text-white">M</div>
           <span className="text-2xl font-bold tracking-tight text-white">
@@ -92,13 +95,105 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <Link to="/blog" className="hover:text-white transition-colors">Blog</Link>
           <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
         </div>
-        <Link
-          to="/login"
-          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 rounded-full text-sm font-bold text-white transition-all shadow-lg shadow-blue-600/20"
-        >
-          Client Login
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            to="/login"
+            className="hidden sm:inline-block px-6 py-2.5 bg-blue-600 hover:bg-blue-500 rounded-full text-sm font-bold text-white transition-all shadow-lg shadow-blue-600/20"
+          >
+            Client Login
+          </Link>
+          
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
+            aria-label="Toggle Menu"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </nav>
+
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="md:hidden bg-slate-900/95 backdrop-blur-xl border-b border-white/10 overflow-hidden z-40 w-full sticky top-16 md:top-20"
+          >
+            <div className="px-6 py-4 flex flex-col gap-3 text-sm font-medium">
+              <Link 
+                to="/" 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className={`hover:text-amber-400 transition-colors py-2 border-b border-white/5 ${location.pathname === "/" ? "text-amber-400 font-bold" : "text-slate-300"}`}
+              >
+                Home
+              </Link>
+              <Link 
+                to="/about" 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className={`hover:text-amber-400 transition-colors py-2 border-b border-white/5 ${location.pathname === "/about" ? "text-amber-400 font-bold" : "text-slate-300"}`}
+              >
+                About Us
+              </Link>
+              <Link 
+                to="/services" 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className={`hover:text-amber-400 transition-colors py-2 border-b border-white/5 ${location.pathname === "/services" ? "text-amber-400 font-bold" : "text-slate-300"}`}
+              >
+                Services
+              </Link>
+              
+              {/* Tools Section in Mobile menu */}
+              <div className="py-2 border-b border-white/5 flex flex-col gap-2">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Tools (Free)</span>
+                <div className="pl-4 flex flex-col gap-3 mt-1">
+                  <Link 
+                    to="/gst-calculator" 
+                    onClick={() => setIsMobileMenuOpen(false)} 
+                    className={`hover:text-amber-400 transition-colors flex items-center gap-2 ${location.pathname === "/gst-calculator" ? "text-amber-400 font-bold" : "text-slate-300"}`}
+                  >
+                    <Calculator className="w-4 h-4 text-amber-500" />
+                    GST Calculator
+                  </Link>
+                  <Link 
+                    to="/hsn-code-finder" 
+                    onClick={() => setIsMobileMenuOpen(false)} 
+                    className={`hover:text-amber-400 transition-colors flex items-center gap-2 ${location.pathname === "/hsn-code-finder" ? "text-amber-400 font-bold" : "text-slate-300"}`}
+                  >
+                    <Search className="w-4 h-4 text-emerald-500" />
+                    HSN Code Finder
+                  </Link>
+                </div>
+              </div>
+
+              <Link 
+                to="/blog" 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className={`hover:text-amber-400 transition-colors py-2 border-b border-white/5 ${location.pathname === "/blog" ? "text-amber-400 font-bold" : "text-slate-300"}`}
+              >
+                Blog
+              </Link>
+              <Link 
+                to="/contact" 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className={`hover:text-amber-400 transition-colors py-2 border-b border-white/5 ${location.pathname === "/contact" ? "text-amber-400 font-bold" : "text-slate-300"}`}
+              >
+                Contact
+              </Link>
+              
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="mt-2 w-full text-center py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-sm font-bold text-white transition-all shadow-lg shadow-blue-600/20"
+              >
+                Client Login
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main className="flex-1 flex flex-col z-10 relative">
         {children}

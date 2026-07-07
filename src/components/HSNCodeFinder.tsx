@@ -139,8 +139,8 @@ export default function HSNCodeFinder() {
         description="Search and find accurate 4, 6, and 8-digit HSN codes and SAC codes with their respective GST rates. Fast, free, and updated for 2024." 
       />
       
-      <div className="pt-24 pb-20 px-6 md:px-10 max-w-5xl mx-auto w-full">
-        <div className="text-center mb-12">
+      <div className="pt-12 md:pt-24 pb-12 md:pb-20 px-6 md:px-10 max-w-5xl mx-auto w-full">
+        <div className="text-center mb-6 md:mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-6">
             <Tag className="w-4 h-4" />
             Lead Magnet Tool

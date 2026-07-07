@@ -26,7 +26,7 @@ export default function ClientPortal() {
   return (
     <MainLayout>
       <SEO title="Client Portal | MyGST Solution" description="Manage your GST compliance and view reports." />
-      <div className="pt-32 pb-20 px-6 max-w-7xl mx-auto min-h-screen">
+      <div className="pt-16 md:pt-32 pb-12 md:pb-20 px-6 max-w-7xl mx-auto min-h-screen">
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
            <div>

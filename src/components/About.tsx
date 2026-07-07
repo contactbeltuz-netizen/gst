@@ -10,13 +10,13 @@ export default function About() {
         title="About Us | MyGST Solution" 
         description="Learn more about our team of dedicated professionals committed to simplifying GST compliance for SMEs and Large Indian businesses."
       />
-      <div className="py-24 px-6 max-w-4xl mx-auto w-full">
+      <div className="py-12 md:py-24 px-6 max-w-4xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="text-center mb-16">
+          <div className="text-center mb-8 md:mb-16">
             <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight text-white leading-[1.1]">
               About <span className="text-amber-400">MyGST Solution</span>
             </h1>

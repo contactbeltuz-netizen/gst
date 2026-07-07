@@ -39,8 +39,8 @@ export default function Blog() {
         description="Stay updated with the latest GST rules, compliance strategies, and legal insights from our expert consultants to keep your business penalty-free." 
       />
       
-      <div className="pt-24 pb-20 px-6 md:px-10 max-w-7xl mx-auto w-full">
-        <div className="mb-12">
+      <div className="pt-12 md:pt-24 pb-12 md:pb-20 px-6 md:px-10 max-w-7xl mx-auto w-full">
+        <div className="mb-6 md:mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-6">
             <BookOpen className="w-4 h-4" />
             Knowledge Base

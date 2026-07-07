@@ -48,7 +48,7 @@ export default function Login() {
   return (
     <MainLayout>
       <SEO title="Login | MyGST Solution" description="Login to your MyGST Solution portal." />
-      <div className="pt-32 pb-20 px-6 max-w-7xl mx-auto min-h-screen flex items-center justify-center">
+      <div className="pt-16 md:pt-32 pb-12 md:pb-20 px-6 max-w-7xl mx-auto min-h-[calc(100vh-5rem)] flex items-center justify-center">
         
         <div className="w-full max-w-md">
            <div className="text-center mb-8">
