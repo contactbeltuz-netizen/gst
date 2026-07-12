@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Search, MapPin, Mail, Phone, Calendar, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { LeadPipelineSkeleton } from "./Skeleton";
 
 interface Lead {
   id: string;
@@ -93,7 +94,7 @@ export default function LeadManagement() {
   );
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-400">Loading leads...</div>;
+    return <LeadPipelineSkeleton />;
   }
 
   return (

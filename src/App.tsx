@@ -13,6 +13,7 @@ import Contact from "./components/Contact";
 import Dashboard from "./components/Dashboard";
 import Blog from "./components/Blog";
 import BlogPostSection83 from "./components/BlogPostSection83";
+import BlogPostDetail from "./components/BlogPostDetail";
 import GSTCalculator from "./components/GSTCalculator";
 import HSNCodeFinder from "./components/HSNCodeFinder";
 import Chatbot from "./components/Chatbot";
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogPostDetail />} />
           <Route path="/gst-calculator" element={<GSTCalculator />} />
           <Route path="/hsn-code-finder" element={<HSNCodeFinder />} />
           <Route path="/when-does-a-gst-proceeding-begin-clearing-the-fog-around-section-83-and-msme-protection" element={<BlogPostSection83 />} />

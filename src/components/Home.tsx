@@ -4,6 +4,7 @@ import { ShieldCheck, ArrowRight, BarChart3, Calculator, MessageSquare, Globe, F
 import { motion } from "motion/react";
 import MainLayout from "./MainLayout";
 import TestimonialCarousel from "./TestimonialCarousel";
+import HomeFAQ from "./HomeFAQ";
 import SEO from "./SEO";
 
 export default function Home() {
@@ -28,7 +29,7 @@ export default function Home() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-200">
               MyGST Solution
             </span>
-            <br /> Consultants
+            <br /> Your Own Tax Consultants
           </h1>
           <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
             From seamless GSTR filings to complex dispute resolutions. Expert GST advisory and compliance services for businesses across India.
@@ -122,6 +123,9 @@ export default function Home() {
       <section className="border-t border-white/5 bg-white/[0.02]">
         <TestimonialCarousel />
       </section>
+
+      {/* Frequently Asked Questions Section */}
+      <HomeFAQ />
     </MainLayout>
   );
 }

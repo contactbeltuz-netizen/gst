@@ -10,6 +10,7 @@ export default function BlogPostSection83() {
       <SEO 
         title="When does a GST proceeding begin? Clearing the fog around Section 83 and MSME Protection" 
         description="Understanding the exact trigger point of Section 83 GST proceedings and how MSMEs can protect their working capital without getting accounts frozen unnecessarily." 
+        keywords={["Section 83 GST", "MSME Protection", "GST proceedings trigger", "bank account freeze GST", "provisional attachment GST", "GST legal defense"]}
       />
       
       <article className="pt-24 pb-20 px-6 md:px-10 max-w-4xl mx-auto w-full">
@@ -29,6 +30,16 @@ export default function BlogPostSection83() {
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-8 leading-tight">
             When does a GST proceeding begin? Clearing the fog around Section 83 and MSME Protection
           </h1>
+        </div>
+
+        {/* Featured Banner Image */}
+        <div className="w-full h-[320px] md:h-[400px] rounded-3xl overflow-hidden mb-12 relative bg-slate-800 border border-white/10 shadow-2xl">
+          <img
+            src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80"
+            alt="When does a GST proceeding begin?"
+            referrerPolicy="no-referrer"
+            className="w-full h-full object-cover"
+          />
         </div>
 
         <div className="prose prose-invert prose-lg max-w-none text-slate-300">

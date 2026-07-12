@@ -10,14 +10,72 @@ interface Message {
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "model", text: "Hello! I am your MyGST Solution AI Consultant. How can I assist you with your tax or GST compliance today?" }
-  ]);
+  const [chatUser, setChatUser] = useState<{ name: string; email: string; phone: string } | null>(() => {
+    const saved = localStorage.getItem("chat_user");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  });
+
+  const [onboardingStep, setOnboardingStep] = useState<"GREETING" | "QUESTION" | "EMAIL" | "PHONE" | "COMPLETED">(() => {
+    const saved = localStorage.getItem("chat_user");
+    return saved ? "COMPLETED" : "GREETING";
+  });
+  const [initialQuestion, setInitialQuestion] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<"fast" | "general" | "deep">("general");
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const typeSystemMessage = async (
+    userText: string | null,
+    fullModelText: string,
+    onComplete?: () => void
+  ) => {
+    setIsLoading(true);
+    if (userText !== null) {
+      setMessages(prev => [...prev, { role: "user" as const, text: userText }]);
+      await new Promise(r => setTimeout(r, 450));
+    }
+    
+    setMessages(prev => [...prev, { role: "model" as const, text: "" }]);
+    
+    let currentText = "";
+    for (let i = 0; i < fullModelText.length; i++) {
+      currentText += fullModelText[i];
+      setMessages(prev => {
+        const copy = [...prev];
+        if (copy.length > 0) {
+          copy[copy.length - 1] = { role: "model" as const, text: currentText };
+        }
+        return copy;
+      });
+      // Standard elegant character typing speed
+      await new Promise(r => setTimeout(r, 15 + Math.random() * 10));
+    }
+    
+    setMessages(prev => {
+      const copy = [...prev];
+      if (copy.length > 0) {
+        copy[copy.length - 1] = { role: "model" as const, text: fullModelText };
+      }
+      return copy;
+    });
+
+    setIsLoading(false);
+    if (onComplete) {
+      onComplete();
+    }
+  };
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -25,20 +83,194 @@ export default function Chatbot() {
     }
   }, [messages, isOpen]);
 
+  useEffect(() => {
+    let active = true;
+    if (isOpen && messages.length === 0) {
+      const triggerHello = async () => {
+        // Natural duration for typing dots before starting
+        await new Promise(r => setTimeout(r, 450));
+        if (!active) return;
+        await typeSystemMessage(null, "Hello");
+      };
+      triggerHello();
+    }
+    return () => {
+      active = false;
+    };
+  }, [isOpen]);
+
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;
 
-    const newMessages = [...messages, { role: "user" as const, text: inputValue }];
+    const typedValue = inputValue.trim();
+
+    if (onboardingStep === "GREETING") {
+      setInputValue("");
+      await typeSystemMessage(
+        typedValue,
+        "Welcome to MyGST Solution. I am your AI tax and compliance assistant Manager.\n\nTo get started, **what specific GST question or concern can I help you with today?**",
+        () => setOnboardingStep("QUESTION")
+      );
+      return;
+    }
+
+    if (onboardingStep === "QUESTION") {
+      setInitialQuestion(typedValue);
+      setInputValue("");
+      await typeSystemMessage(
+        typedValue,
+        "I can certainly help you with that! To make sure I can mail you a full **Chat Transcript** of our session along with reference links, could you please enter your **Email ID**?",
+        () => setOnboardingStep("EMAIL")
+      );
+      return;
+    }
+
+    if (onboardingStep === "EMAIL") {
+      if (!typedValue.includes("@") || typedValue.length < 5) {
+        setInputValue("");
+        await typeSystemMessage(
+          typedValue,
+          "That doesn't look like a valid email address. Please enter a valid Email ID (e.g. name@example.com) so we can send the chat transcript."
+        );
+        return;
+      }
+      setUserEmail(typedValue);
+      setInputValue("");
+      await typeSystemMessage(
+        typedValue,
+        "Perfect! And what **Phone Number** or **WhatsApp ID** can our team use to send you a quick follow-up or updates after our chat?",
+        () => setOnboardingStep("PHONE")
+      );
+      return;
+    }
+
+    if (onboardingStep === "PHONE") {
+      const cleanPhone = typedValue.replace(/\D/g, "");
+      if (cleanPhone.length < 6) {
+        setInputValue("");
+        await typeSystemMessage(
+          typedValue,
+          "Please share a valid Phone Number or WhatsApp ID (at least 6 digits) so we can stay connected."
+        );
+        return;
+      }
+      setInputValue("");
+
+      await typeSystemMessage(
+        typedValue,
+        "Excellent! Registering your advisory session and activating our GST AI Expert to analyze your query...",
+        async () => {
+          setIsLoading(true);
+          try {
+            // Submit lead to the backend API so it shows on the Admin Dashboard instantly!
+            await fetch("/api/submit-lead", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: `Chat Client (${typedValue})`,
+                email: userEmail,
+                phone: typedValue,
+                service: `GST Chat: ${initialQuestion.substring(0, 40)}${initialQuestion.length > 40 ? "..." : ""}`,
+                business_type: "Small Business (SME)"
+              })
+            });
+
+            // Save to localStorage
+            const userData = { name: "Chat Client", email: userEmail, phone: typedValue };
+            localStorage.setItem("chat_user", JSON.stringify(userData));
+            setChatUser(userData);
+
+            // Transition to completed normal chat
+            setOnboardingStep("COMPLETED");
+
+            // Now trigger the AI response for the user's initial question!
+            const aiPayload = [
+              { role: "user", parts: [{ text: initialQuestion }] }
+            ];
+
+            const response = await fetch("/api/chat", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                messages: aiPayload,
+                speedConfig: mode
+              })
+            });
+
+            if (!response.ok) throw new Error("Failed to connect");
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let currentModelText = "";
+            
+            setMessages(prev => [...prev, { role: "model", text: "" }]);
+
+            if (reader) {
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split("\n\n");
+                
+                for (const line of lines) {
+                  if (line.startsWith("data: ")) {
+                    const dataStr = line.slice(6).trim();
+                    if (dataStr === "[DONE]") break;
+                    if (!dataStr) continue;
+                    
+                    try {
+                      const data = JSON.parse(dataStr);
+                      if (data.text) {
+                        for (let i = 0; i < data.text.length; i++) {
+                          currentModelText += data.text[i];
+                          setMessages(prev => {
+                            const updated = [...prev];
+                            updated[updated.length - 1].text = currentModelText;
+                            return updated;
+                          });
+                          await new Promise(r => setTimeout(r, 6 + Math.random() * 8));
+                        }
+                      }
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }
+                }
+              }
+            }
+          } catch (err) {
+            console.error(err);
+            setMessages(prev => [
+              ...prev,
+              { role: "model", text: "Contact information received! Let's start the consultation. Please ask me any details about your GST query!" }
+            ]);
+          } finally {
+            setIsLoading(false);
+          }
+        }
+      );
+      return;
+    }
+
+    // Normal conversation flow (onboardingStep === "COMPLETED")
+    const newMessages = [...messages, { role: "user" as const, text: typedValue }];
     setMessages(newMessages);
     setInputValue("");
     setIsLoading(true);
 
     try {
+      // Filter onboarding messages to keep chat history clean
+      const relevantMessages = newMessages.filter(m => {
+        const t = m.text.toLowerCase();
+        return !t.includes("transcript") && !t.includes("phone number") && !t.includes("registering your consultation");
+      });
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: newMessages.map(m => ({ role: m.role, parts: [{ text: m.text }] })),
+          messages: relevantMessages.map(m => ({ role: m.role, parts: [{ text: m.text }] })),
           speedConfig: mode
         })
       });
@@ -58,7 +290,7 @@ export default function Chatbot() {
           if (done) break;
 
           const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n\n"); // Split by double newline as per SSE standard
+          const lines = chunk.split("\n\n");
           
           for (const line of lines) {
             if (line.startsWith("data: ")) {
@@ -71,7 +303,6 @@ export default function Chatbot() {
               try {
                 const data = JSON.parse(dataStr);
                 if (data.text) {
-                  // Realistic typing effect
                   for (let i = 0; i < data.text.length; i++) {
                     currentModelText += data.text[i];
                     setMessages(prev => {
@@ -79,8 +310,7 @@ export default function Chatbot() {
                       updated[updated.length - 1].text = currentModelText;
                       return updated;
                     });
-                    // Small delay to simulate realistic processing/typing
-                    await new Promise(r => setTimeout(r, 10 + Math.random() * 15));
+                    await new Promise(r => setTimeout(r, 6 + Math.random() * 8));
                   }
                 }
                 if (data.error) {
@@ -111,6 +341,15 @@ export default function Chatbot() {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleResetChat = () => {
+    localStorage.removeItem("chat_user");
+    setChatUser(null);
+    setInitialQuestion("");
+    setUserEmail("");
+    setOnboardingStep("GREETING");
+    setMessages([]);
   };
 
   return (
@@ -152,7 +391,33 @@ export default function Chatbot() {
                     </div>
                     <div>
                       <h3 className="text-white font-medium text-sm">GST Advisory AI</h3>
-                      <p className="text-slate-400 text-xs">Powered by Gemini</p>
+                      {onboardingStep === "COMPLETED" && chatUser ? (
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <p className="text-amber-400 text-[10px] font-mono tracking-wide truncate max-w-[130px]">
+                            Chatting as: {chatUser.name}
+                          </p>
+                          <button
+                            onClick={handleResetChat}
+                            className="text-slate-500 hover:text-rose-400 text-[9px] underline transition-colors"
+                          >
+                            (Reset)
+                          </button>
+                        </div>
+                      ) : onboardingStep !== "QUESTION" ? (
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <p className="text-amber-500/80 text-[10px] font-medium animate-pulse">
+                            Onboarding...
+                          </p>
+                          <button
+                            onClick={handleResetChat}
+                            className="text-slate-500 hover:text-rose-400 text-[9px] underline transition-colors"
+                          >
+                            (Restart)
+                          </button>
+                        </div>
+                      ) : (
+                        <p className="text-slate-400 text-xs">Powered by Gemini</p>
+                      )}
                     </div>
                   </div>
                   <button 
@@ -232,7 +497,13 @@ export default function Chatbot() {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Ask about GST registration, filing, audits..."
+                    placeholder={
+                      onboardingStep === "GREETING" ? "Type your message here to start..." :
+                      onboardingStep === "QUESTION" ? "Type your specific question..." :
+                      onboardingStep === "EMAIL" ? "Type your email address..." :
+                      onboardingStep === "PHONE" ? "Type your phone number..." :
+                      "Ask about GST registration, filing, audits..."
+                    }
                     className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-4 pr-12 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 resize-none"
                     rows={1}
                     style={{ minHeight: '48px', maxHeight: '120px' }}
